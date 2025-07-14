@@ -28,41 +28,47 @@
       transition: background 0.5s;
     }
 
-	 #clock {
-	  font-family: inherit;
-	  font-variant-numeric: tabular-nums;
-	  font-size: 5em;
-	  font-weight: 300;
-	  letter-spacing: 2px;
-	  color: #ffffffcc;
-	  text-align: center;
-	  width: 400px;
-	  height: 180px;
-	  padding: 20px 30px;
-	  border-radius: 35px;
-	  background: var(--glass-bg);
-	  backdrop-filter: blur(var(--blur-amount)) saturate(180%);
-	  -webkit-backdrop-filter: blur(var(--blur-amount)) saturate(180%);
-	  border: 1px solid var(--glass-border);
-	  box-shadow: 0 8px 24px var(--glass-shadow);
-	  transition: all 0.5s;
-	  overflow: hidden;
-	  display: flex;
-	  align-items: center;
-	  justify-content: center;
-	  box-sizing: border-box;
-	  white-space: nowrap;
-	}
+    #clock {
+      font-family: inherit;
+      font-variant-numeric: tabular-nums;
+      font-size: 5em;
+      font-weight: 300;
+      letter-spacing: 2px;
+      color: #ffffffcc;
+      text-align: center;
+      width: 400px;
+      height: 180px;
+      padding: 20px 30px;
+      border-radius: 35px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--blur-amount)) saturate(180%);
+      -webkit-backdrop-filter: blur(var(--blur-amount)) saturate(180%);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 8px 24px var(--glass-shadow);
+      transition: all 0.5s;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      white-space: nowrap;
+    }
 
-
-    #customize-btn {
+    #button-container {
       position: fixed;
       bottom: 30px;
-      right: 30px;
-      padding: 14px 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+      z-index: 1000;
+    }
+
+    .glass-button {
+      padding: 12px 20px;
       font-size: 1em;
       border: none;
-      border-radius: 24px;
+      border-radius: 20px;
       background: var(--glass-bg);
       backdrop-filter: blur(20px) saturate(180%);
       -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -73,10 +79,10 @@
       transition: opacity 0.5s, background 0.3s;
       font-family: inherit;
     }
-    #customize-btn:hover {
+    .glass-button:hover {
       background: rgba(255, 255, 255, 0.3);
     }
-    #customize-btn.hidden {
+    .glass-button.hidden {
       opacity: 0;
       pointer-events: none;
     }
@@ -97,9 +103,19 @@
       gap: 20px;
       max-width: 90%;
       width: 360px;
+      max-height: 80vh;
+      overflow-y: auto;
       color: #fff;
       border: 1px solid var(--glass-border);
       font-family: inherit;
+    }
+
+    #customize-modal::-webkit-scrollbar {
+      width: 6px;
+    }
+    #customize-modal::-webkit-scrollbar-thumb {
+      background-color: rgba(255,255,255,0.3);
+      border-radius: 3px;
     }
 
     #customize-modal h2 {
@@ -187,7 +203,11 @@
 </head>
 <body>
   <div id="clock">00:00</div>
-  <button id="customize-btn">Personnaliser</button>
+
+  <div id="button-container">
+    <button id="customize-btn" class="glass-button">Personnaliser</button>
+    <button id="fullscreen-btn" class="glass-button">Plein écran</button>
+  </div>
 
   <div id="customize-modal">
     <h2>Réglages</h2>
@@ -231,6 +251,7 @@
   <script>
     const clock = document.getElementById('clock');
     const customizeBtn = document.getElementById('customize-btn');
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
     const modal = document.getElementById('customize-modal');
     const bgTypeRadios = document.querySelectorAll('input[name="bg-type"]');
     const bgColor1Input = document.getElementById('bg-color1');
@@ -301,12 +322,22 @@
       updateClock();
     });
 
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
     let inactivityTimer;
     function resetInactivityTimer() {
       customizeBtn.classList.remove('hidden');
+      fullscreenBtn.classList.remove('hidden');
       clearTimeout(inactivityTimer);
       inactivityTimer = setTimeout(() => {
         customizeBtn.classList.add('hidden');
+        fullscreenBtn.classList.add('hidden');
       }, 5000);
     }
     document.addEventListener('mousemove', resetInactivityTimer);
